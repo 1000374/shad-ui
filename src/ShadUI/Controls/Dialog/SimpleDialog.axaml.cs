@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
 
 // ReSharper disable once CheckNamespace
 namespace ShadUI;
@@ -14,9 +15,14 @@ namespace ShadUI;
 [TemplatePart("PART_SecondaryButton", typeof(Button))]
 [TemplatePart("PART_TertiaryButton", typeof(Button))]
 [TemplatePart("PART_CancelButton", typeof(Button))]
-internal class SimpleDialog : TemplatedControl
+internal class SimpleDialog : TemplatedControl, IDisposable
 {
     private readonly DialogManager? _manager;
+    private Button? _primaryButton;
+    private Button? _secondaryButton;
+    private Button? _tertiaryButton;
+    private Button? _cancelButton;
+    private bool _disposed;
 
     public SimpleDialog()
     {
@@ -141,34 +147,110 @@ internal class SimpleDialog : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        e.NameScope.Get<Button>("PART_PrimaryButton").Click += (_, _) =>
+
+        DetachButtonHandlers();
+
+        _primaryButton = e.NameScope.Get<Button>("PART_PrimaryButton");
+        _secondaryButton = e.NameScope.Get<Button>("PART_SecondaryButton");
+        _tertiaryButton = e.NameScope.Get<Button>("PART_TertiaryButton");
+        _cancelButton = e.NameScope.Get<Button>("PART_CancelButton");
+
+        if (_primaryButton is not null)
+            _primaryButton.Click += OnPrimaryButtonClick;
+        if (_secondaryButton is not null)
+            _secondaryButton.Click += OnSecondaryButtonClick;
+        if (_tertiaryButton is not null)
+            _tertiaryButton.Click += OnTertiaryButtonClick;
+        if (_cancelButton is not null)
+            _cancelButton.Click += OnCancelButtonClick;
+    }
+
+    private async void OnPrimaryButtonClick(object? sender, RoutedEventArgs e)
+    {
+        try
         {
-            _manager?.CloseDialog(this);
-            _manager?.OpenLast();
             PrimaryCallback?.Invoke();
-            PrimaryCallbackAsync?.Invoke();
-        };
-        e.NameScope.Get<Button>("PART_SecondaryButton").Click += (_, _) =>
+            if (PrimaryCallbackAsync is not null)
+                await PrimaryCallbackAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
         {
             _manager?.CloseDialog(this);
             _manager?.OpenLast();
+        }
+    }
+
+    private async void OnSecondaryButtonClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
             SecondaryCallback?.Invoke();
-            SecondaryCallbackAsync?.Invoke();
-        };
-        e.NameScope.Get<Button>("PART_TertiaryButton").Click += (_, _) =>
+            if (SecondaryCallbackAsync is not null)
+                await SecondaryCallbackAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
         {
             _manager?.CloseDialog(this);
             _manager?.OpenLast();
+        }
+    }
+
+    private async void OnTertiaryButtonClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
             TertiaryCallback?.Invoke();
-            TertiaryCallbackAsync?.Invoke();
-        };
-        e.NameScope.Get<Button>("PART_CancelButton").Click += (_, _) =>
+            if (TertiaryCallbackAsync is not null)
+                await TertiaryCallbackAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
         {
             _manager?.CloseDialog(this);
             _manager?.OpenLast();
+        }
+    }
+
+    private async void OnCancelButtonClick(object? sender, RoutedEventArgs e)
+    {
+        try
+        {
             CancelCallback?.Invoke();
-            CancelCallbackAsync?.Invoke();
-        };
+            if (CancelCallbackAsync is not null)
+                await CancelCallbackAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
+        finally
+        {
+            _manager?.CloseDialog(this);
+            _manager?.OpenLast();
+        }
+    }
+
+    private void DetachButtonHandlers()
+    {
+        if (_primaryButton is not null)
+            _primaryButton.Click -= OnPrimaryButtonClick;
+        if (_secondaryButton is not null)
+            _secondaryButton.Click -= OnSecondaryButtonClick;
+        if (_tertiaryButton is not null)
+            _tertiaryButton.Click -= OnTertiaryButtonClick;
+        if (_cancelButton is not null)
+            _cancelButton.Click -= OnCancelButtonClick;
     }
 
     /// <summary>
@@ -250,5 +332,37 @@ internal class SimpleDialog : TemplatedControl
     private static char GetHexChar(int value)
     {
         return (char)(value < 10 ? '0' + value : 'A' + (value - 10));
+    }
+
+    /// <summary>
+    ///     Disposes the dialog and cleans up event subscriptions and callbacks.
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed) return;
+
+        // Detach button event handlers
+        DetachButtonHandlers();
+
+        // Clear callback references to allow garbage collection
+        PrimaryCallback = null;
+        PrimaryCallbackAsync = null;
+        SecondaryCallback = null;
+        SecondaryCallbackAsync = null;
+        TertiaryCallback = null;
+        TertiaryCallbackAsync = null;
+        CancelCallback = null;
+        CancelCallbackAsync = null;
+
+        _disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    ///     Finalizer to ensure cleanup if Dispose is not called.
+    /// </summary>
+    ~SimpleDialog()
+    {
+        Dispose();
     }
 }

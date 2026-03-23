@@ -15,6 +15,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private readonly DashboardViewModel _dashboardViewModel;
     private readonly ThemeViewModel _themeViewModel;
     private readonly TypographyViewModel _typographyViewModel;
+    private readonly SmoothScrollViewModel _smoothScrollViewModel;
     private readonly AvatarViewModel _avatarViewModel;
     private readonly BadgeViewModel _badgeViewModel;
     private readonly ButtonViewModel _buttonViewModel;
@@ -38,6 +39,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private readonly ToggleViewModel _toggleViewModel;
     private readonly ToolTipViewModel _toolTipViewModel;
     private readonly MiscellaneousViewModel _miscellaneousViewModel;
+    private object? _previousPage;
+    private bool _disposed;
 
     public MainWindowViewModel(
         PageManager pageManager,
@@ -48,6 +51,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         DashboardViewModel dashboardViewModel,
         ThemeViewModel themeViewModel,
         TypographyViewModel typographyViewModel,
+        SmoothScrollViewModel smoothScrollViewModel,
         AvatarViewModel avatarViewModel,
         BadgeViewModel badgeViewModel,
         ButtonViewModel buttonViewModel,
@@ -79,6 +83,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         _dashboardViewModel = dashboardViewModel;
         _themeViewModel = themeViewModel;
         _typographyViewModel = typographyViewModel;
+        _smoothScrollViewModel = smoothScrollViewModel;
         _avatarViewModel = avatarViewModel;
         _badgeViewModel = badgeViewModel;
         _buttonViewModel = buttonViewModel;
@@ -125,6 +130,13 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         CurrentRoute = route;
 
         if (SelectedPage == page) return;
+
+        if (_previousPage is IDisposable disposablePrevious)
+        {
+            disposablePrevious.Dispose();
+        }
+
+        _previousPage = SelectedPage;
         SelectedPage = page;
         CurrentRoute = route;
         page.Initialize();
@@ -146,6 +158,12 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     private void OpenTypography()
     {
         SwitchPage(_typographyViewModel);
+    }
+
+    [RelayCommand]
+    private void OpenSmoothScroll()
+    {
+        SwitchPage(_smoothScrollViewModel);
     }
 
     [RelayCommand]
@@ -355,5 +373,35 @@ public sealed partial class MainWindowViewModel : ViewModelBase
         };
 
         _themeWatcher.SwitchTheme(CurrentTheme);
+    }
+
+    /// <summary>
+    ///     Disposes the MainWindowViewModel and cleans up all pages and resources.
+    /// </summary>
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        if (_disposed) return;
+
+        if (SelectedPage is IDisposable disposableCurrent)
+        {
+            disposableCurrent.Dispose();
+        }
+
+        if (_previousPage is IDisposable disposablePrevious)
+        {
+            disposablePrevious.Dispose();
+        }
+
+        DialogManager.Dispose();
+
+        _disposed = true;
+        GC.SuppressFinalize(this);
+    }
+
+    ~MainWindowViewModel()
+    {
+        Dispose();
     }
 }

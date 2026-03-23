@@ -55,6 +55,7 @@ namespace ShadUI.Demo;
 [Transient<ToggleViewModel>]
 [Transient<ToolTipViewModel>]
 [Transient<TypographyViewModel>]
+[Transient<SmoothScrollViewModel>]
 [Transient<TextBlockViewModel>]
 [Transient<SelectableTextBlockViewModel>]
 [Transient<LabelViewModel>]

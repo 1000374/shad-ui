@@ -55,11 +55,16 @@ public sealed class DialogManager
         Dialogs.Remove(control);
 
         OnDialogClosed?.Invoke(this, new DialogClosedEventArgs
-        {
-            ReplaceExisting = Dialogs.Count > 0,
-            Control = control
-        }
+            {
+                ReplaceExisting = Dialogs.Count > 0,
+                Control = control
+            }
         );
+
+        if (control is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
     }
 
     internal void OpenLast()
@@ -112,7 +117,7 @@ public sealed class DialogManager
 
         if (OnSuccessWithContextCallbacks.Remove(type, out var successWithContextCallback) && success)
         {
-            if(context is not null) successWithContextCallback?.Invoke(context);
+            if (context is not null) successWithContextCallback?.Invoke(context);
         }
 
         if (OnSuccessAsyncCallbacks.Remove(type, out var successAsyncCallback) && success)
@@ -122,7 +127,7 @@ public sealed class DialogManager
 
         if (OnSuccessWithContextAsyncCallbacks.Remove(type, out var successWithContextAsyncCallback) && success)
         {
-            if(context is not null) successWithContextAsyncCallback?.Invoke(context);
+            if (context is not null) successWithContextAsyncCallback?.Invoke(context);
         }
 
         if (OnCancelCallbacks.Remove(type, out var cancelCallback) && !success)
@@ -134,6 +139,13 @@ public sealed class DialogManager
         {
             cancelAsyncCallback?.Invoke();
         }
+
+        OnSuccessCallbacks.Remove(type);
+        OnSuccessWithContextCallbacks.Remove(type);
+        OnSuccessAsyncCallbacks.Remove(type);
+        OnSuccessWithContextAsyncCallbacks.Remove(type);
+        OnCancelCallbacks.Remove(type);
+        OnCancelAsyncCallbacks.Remove(type);
     }
 
     /// <summary>
@@ -162,8 +174,24 @@ public sealed class DialogManager
         Dialogs.Clear();
         OnSuccessAsyncCallbacks.Clear();
         OnSuccessCallbacks.Clear();
+        OnSuccessWithContextCallbacks.Clear();
+        OnSuccessWithContextAsyncCallbacks.Clear();
         OnCancelAsyncCallbacks.Clear();
         OnCancelCallbacks.Clear();
+    }
+
+    /// <summary>
+    ///     Clears all dialogs and callbacks. Use this to prevent memory leaks when closing windows.
+    /// </summary>
+    public void Dispose()
+    {
+        var dialogs = Dialogs.Keys.ToList();
+        foreach (var dialog in dialogs)
+        {
+            CloseDialog(dialog);
+        }
+
+        RemoveAll();
     }
 
     internal event EventHandler<bool>? AllowDismissChanged;

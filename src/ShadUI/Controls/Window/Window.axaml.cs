@@ -9,6 +9,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Threading;
+using ShadUI.Utilities.MacOS;
 
 // ReSharper disable once CheckNamespace
 namespace ShadUI;
@@ -164,21 +166,6 @@ public class Window : Avalonia.Controls.Window
     }
 
     /// <summary>
-    ///     Whether to enable minimize.
-    /// </summary>
-    public static readonly StyledProperty<bool> CanMinimizeProperty =
-        AvaloniaProperty.Register<Window, bool>(nameof(CanMinimize), true);
-
-    /// <summary>
-    ///     Gets or sets the value of the <see cref="CanMinimizeProperty" />.
-    /// </summary>
-    public bool CanMinimize
-    {
-        get => GetValue(CanMinimizeProperty);
-        set => SetValue(CanMinimizeProperty, value);
-    }
-
-    /// <summary>
     ///     Whether to show the title bar background.
     /// </summary>
     public static readonly StyledProperty<bool> ShowTitlebarBackgroundProperty =
@@ -191,21 +178,6 @@ public class Window : Avalonia.Controls.Window
     {
         get => GetValue(ShowTitlebarBackgroundProperty);
         set => SetValue(ShowTitlebarBackgroundProperty, value);
-    }
-
-    /// <summary>
-    ///     Whether to enable maximize.
-    /// </summary>
-    public static readonly StyledProperty<bool> CanMaximizeProperty =
-        AvaloniaProperty.Register<Window, bool>(nameof(CanMaximize), true);
-
-    /// <summary>
-    ///     Gets or sets the value of the <see cref="CanMaximizeProperty" />.
-    /// </summary>
-    public bool CanMaximize
-    {
-        get => GetValue(CanMaximizeProperty);
-        set => SetValue(CanMaximizeProperty, value);
     }
 
     /// <summary>
@@ -270,6 +242,38 @@ public class Window : Avalonia.Controls.Window
     }
 
     /// <summary>
+    ///     The offset for macOS traffic light buttons from their default position.
+    ///     X moves buttons right (positive) or left (negative).
+    ///     Y moves buttons down (positive) or up (negative).
+    /// </summary>
+    public static readonly StyledProperty<Point> TrafficLightOffsetProperty =
+        AvaloniaProperty.Register<Window, Point>(nameof(TrafficLightOffset));
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="TrafficLightOffsetProperty" />.
+    /// </summary>
+    public Point TrafficLightOffset
+    {
+        get => GetValue(TrafficLightOffsetProperty);
+        set => SetValue(TrafficLightOffsetProperty, value);
+    }
+
+    /// <summary>
+    ///     Whether to enable custom traffic light positioning on macOS.
+    /// </summary>
+    public static readonly StyledProperty<bool> EnableTrafficLightPositioningProperty =
+        AvaloniaProperty.Register<Window, bool>(nameof(EnableTrafficLightPositioning));
+
+    /// <summary>
+    ///     Gets or sets the value of the <see cref="EnableTrafficLightPositioningProperty" />.
+    /// </summary>
+    public bool EnableTrafficLightPositioning
+    {
+        get => GetValue(EnableTrafficLightPositioningProperty);
+        set => SetValue(EnableTrafficLightPositioningProperty, value);
+    }
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="Window" /> class.
     /// </summary>
     protected Window()
@@ -319,9 +323,31 @@ public class Window : Avalonia.Controls.Window
                 this.UnmanageWindowState();
             }
         }
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && _trafficLightPositionInitialized)
+        {
+            if (change.Property == TrafficLightOffsetProperty ||
+                change.Property == BoundsProperty ||
+                change.Property == WindowStateProperty)
+            {
+                ApplyTrafficLightOffset();
+            }
+        }
+
+        if (change.Property == EnableTrafficLightPositioningProperty)
+        {
+            var enabled = change.GetNewValue<bool>();
+            if (enabled && RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !_trafficLightPositionInitialized)
+            {
+                Dispatcher.UIThread.Post(InitializeTrafficLightPositioning, DispatcherPriority.Loaded);
+            }
+        }
     }
 
     private Button? _maximizeButton;
+    private CornerRadius _lastCornerRadius;
+    private IntPtr _nsWindowHandle;
+    private bool _trafficLightPositionInitialized;
 
     /// <summary>
     ///     Called when the template is applied.
@@ -354,8 +380,8 @@ public class Window : Avalonia.Controls.Window
             titleBar.PointerPressed += OnTitleBarPointerPressed;
             titleBar.DoubleTapped += OnMaximizeButtonClicked;
         }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             if (e.NameScope.Get<Panel>("PART_Root") is { } rootPanel)
             {
@@ -367,11 +393,38 @@ public class Window : Avalonia.Controls.Window
                 RootCornerRadius = new CornerRadius(10);
             }
         }
+
+        _lastCornerRadius = RootCornerRadius;
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && EnableTrafficLightPositioning)
+        {
+            Dispatcher.UIThread.Post(InitializeTrafficLightPositioning, DispatcherPriority.Loaded);
+        }
+    }
+
+    private void InitializeTrafficLightPositioning()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
+
+        _nsWindowHandle = this.TryGetPlatformHandle()?.Handle ?? IntPtr.Zero;
+        if (_nsWindowHandle == IntPtr.Zero) return;
+
+        ApplyTrafficLightOffset();
+        _trafficLightPositionInitialized = true;
+    }
+
+    private void ApplyTrafficLightOffset()
+    {
+        if (_nsWindowHandle == IntPtr.Zero) return;
+        if (WindowState == WindowState.FullScreen) return;
+
+        TrafficLightHelper.SetTrafficLightOffset(_nsWindowHandle, TrafficLightOffset);
     }
 
     private void OnMaximizeButtonClicked(object? sender, RoutedEventArgs args)
     {
         if (!CanMaximize || !CanResize || WindowState == WindowState.FullScreen) return;
+        
         WindowState = WindowState == WindowState.Maximized
             ? WindowState.Normal
             : WindowState.Maximized;
@@ -444,16 +497,20 @@ public class Window : Avalonia.Controls.Window
         {
             case WindowState.FullScreen:
                 ToggleMaxButtonVisibility(false);
+                _lastCornerRadius = RootCornerRadius;
+                RootCornerRadius = new CornerRadius(0);
                 Margin = new Thickness(-1);
                 break;
             case WindowState.Maximized:
                 ToggleMaxButtonVisibility(CanMaximize);
-                Margin = RuntimeInformation.IsOSPlatform(OSPlatform.Linux)
-                    ? new Thickness(0)
-                    : new Thickness(7);
+                RootCornerRadius = _lastCornerRadius;
+                Margin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? new Thickness(7)
+                    : new Thickness(0);
                 break;
             case WindowState.Normal:
                 ToggleMaxButtonVisibility(CanMaximize);
+                RootCornerRadius = _lastCornerRadius;
                 Margin = new Thickness(0);
                 break;
             default:
