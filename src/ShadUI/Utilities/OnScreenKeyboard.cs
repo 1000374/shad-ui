@@ -188,7 +188,12 @@ internal static class OnScreenKeyboard
 
         // ReSharper disable once SuspiciousTypeConversion.Global
         ((ITipInvocation)uiHostNoLaunch).Toggle(hwnd);
-        Marshal.ReleaseComObject(uiHostNoLaunch);
+#if NETCOREAPP3_0_OR_GREATER
+        if (OperatingSystem.IsWindows())
+        {
+            Marshal.ReleaseComObject(uiHostNoLaunch);
+        }
+#endif
     }
 
     [ComImport] [Guid("4ce576fa-83dc-4F88-951c-9d0782b4e376")]

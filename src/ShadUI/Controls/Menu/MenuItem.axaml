@@ -80,7 +80,7 @@
                                             <TextBlock
                                                 FontSize="14"
                                                 FontWeight="Medium"
-                                                Text="{CompiledBinding}" />
+                                                Text="{Binding}" />
                                         </DataTemplate>
                                     </ContentPresenter.DataTemplates>
                                 </ContentPresenter>

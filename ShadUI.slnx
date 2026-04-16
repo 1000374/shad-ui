@@ -1,0 +1,17 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="src/ShadUI.Demo/ShadUI.Demo.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="src/ShadUI.Package/ShadUI.Package.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5" Id="facfcc37-fb25-420a-89df-cac5915135c7">
+    <Deploy />
+  </Project>
+  <Project Path="src/ShadUI.Tests/ShadUI.Tests.csproj" />
+  <Project Path="src/ShadUI/ShadUI.csproj" />
+</Solution>

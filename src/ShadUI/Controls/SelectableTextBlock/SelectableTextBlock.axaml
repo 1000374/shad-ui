@@ -8,11 +8,11 @@
 
     <MenuFlyout Placement="Bottom" x:Key="SelectableTextBlockContextFlyout">
         <MenuItem
-            Command="{CompiledBinding $parent[SelectableTextBlock].Copy}"
+            Command="{Binding $parent[SelectableTextBlock].Copy}"
             Cursor="Arrow"
             Header="{DynamicResource StringTextFlyoutCopyText}"
             InputGesture="{x:Static TextBox.CopyGesture}"
-            IsEnabled="{CompiledBinding $parent[SelectableTextBlock].CanCopy}"
+            IsEnabled="{Binding $parent[SelectableTextBlock].CanCopy}"
             x:Name="SelectableTextBlockContextFlyoutCopyItem" />
     </MenuFlyout>
 

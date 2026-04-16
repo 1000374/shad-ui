@@ -80,7 +80,7 @@
                                             FontSize="14"
                                             FontWeight="DemiBold"
                                             Name="TriggerText"
-                                            Text="{CompiledBinding}" />
+                                            Text="{Binding}" />
                                     </DataTemplate>
                                 </ContentPresenter.DataTemplates>
                             </ContentPresenter>
@@ -91,7 +91,7 @@
                             IsOpen="{TemplateBinding IsDropDownOpen,
                                                      Mode=TwoWay}"
                             Name="PART_Popup"
-                            OverlayInputPassThroughElement="{CompiledBinding $parent[shadui:SimpleDropdown]}"
+                            OverlayInputPassThroughElement="{Binding $parent[shadui:SimpleDropdown]}"
                             Placement="{TemplateBinding PopupPlacement}"
                             VerticalOffset="{TemplateBinding PopupVerticalOffset}"
                             Width="{TemplateBinding PopupWidth}">

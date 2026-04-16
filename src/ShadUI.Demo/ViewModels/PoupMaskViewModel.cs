@@ -67,7 +67,7 @@ namespace ShadUI.Demo.ViewModels
         [RelayCommand]
         private void ShowDialog()
         {
-            _userControlManager
+            UserControlManager
                 .CreateDialog(
                     "Are you absolutely sure?",
                     "This action cannot be undone. This will permanently delete your account and remove your data from our servers.")
@@ -87,7 +87,7 @@ namespace ShadUI.Demo.ViewModels
         [RelayCommand]
         private void ShowDestructiveStyleDialog()
         {
-            _userControlManager
+            UserControlManager
                 .CreateDialog(
                     "Are you absolutely sure?",
                     "This action cannot be undone. This will permanently delete your account and remove your data from our servers.")
@@ -110,7 +110,7 @@ namespace ShadUI.Demo.ViewModels
         private void ShowCustomDialog()
         {
             _loginViewModel.Initialize();
-            _userControlManager.CreateDialog(_loginViewModel)
+            UserControlManager.CreateDialog(_loginViewModel)
                 .Dismissible()
                 .WithSuccessCallback(vm =>
                     _toastManager.CreateToast("Sign in successful")

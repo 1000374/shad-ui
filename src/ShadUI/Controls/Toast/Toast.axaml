@@ -44,7 +44,7 @@
                                     Data="{x:Static shadui:Icons.Warning}"
                                     Foreground="{DynamicResource ForegroundColor}"
                                     Height="20"
-                                    IsVisible="{CompiledBinding Data,
+                                    IsVisible="{Binding Data,
                                                                 ElementName=PART_Icon,
                                                                 Converter={x:Static ObjectConverters.IsNotNull}}"
                                     Margin="0,0,8,0"

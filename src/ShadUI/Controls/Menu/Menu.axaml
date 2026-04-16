@@ -63,7 +63,7 @@
                                             FontSize="14"
                                             FontWeight="Medium"
                                             Name="HeaderText"
-                                            Text="{CompiledBinding}" />
+                                            Text="{Binding}" />
                                     </DataTemplate>
                                 </ContentPresenter.DataTemplates>
                             </ContentPresenter>

@@ -13,7 +13,7 @@ namespace ShadUI;
 internal sealed class SmoothScrollController
 {
     private readonly ScrollViewer _instance;
-    private IRenderRoot? _visualRoot;
+    private IPresentationSource? _visualRoot;
     private TopLevel? _topLevel;
 
     private double _targetX, _currentX;
@@ -78,8 +78,8 @@ internal sealed class SmoothScrollController
 
         var source = e.Source as Visual;
         
-        var sourceRoot = source?.GetVisualRoot();
-        _visualRoot ??= _instance.GetVisualRoot();
+        var sourceRoot = source?.GetPresentationSource();
+        _visualRoot ??= _instance.GetPresentationSource();
 
         if (sourceRoot != _visualRoot)
             return; // this event is from a popup/flyout. TRAP IT!!! >:)

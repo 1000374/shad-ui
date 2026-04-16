@@ -348,7 +348,7 @@ public static class WindowExt
         {
             if (!window.CanResize) return;
             if (sender is not Border { Tag: string edge }) return;
-            if (window.GetVisualRoot() is not Window w) return;
+            if (window.GetPresentationSource() is not Window w) return;
 
             var windowEdge = edge switch
             {

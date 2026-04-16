@@ -217,7 +217,7 @@
                                     Name="PART_PickerPresenter"
                                     shadui:ScrollEventAssist.PreventScrollPropagation="True">
                                     <TimePickerPresenter.KeyBindings>
-                                        <KeyBinding Command="{CompiledBinding $parent[Popup].Close}" Gesture="Escape" />
+                                        <KeyBinding Command="{Binding $parent[Popup].Close}" Gesture="Escape" />
                                     </TimePickerPresenter.KeyBindings>
                                 </TimePickerPresenter>
                             </Popup>

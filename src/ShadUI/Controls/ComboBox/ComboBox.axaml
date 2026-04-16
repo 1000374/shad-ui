@@ -129,9 +129,9 @@
                                         IsOpen="{TemplateBinding IsDropDownOpen,
                                                                  Mode=TwoWay}"
                                         MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                        MinWidth="{CompiledBinding #Border.Bounds.Width}"
+                                        MinWidth="{Binding #Border.Bounds.Width}"
                                         Name="PART_Popup"
-                                        PlacementTarget="{CompiledBinding #Border}"
+                                        PlacementTarget="{Binding #Border}"
                                         VerticalOffset="5">
                                         <LayoutTransformControl Name="LayoutTransform" RenderTransformOrigin="50%, 0%">
                                             <Border
@@ -141,7 +141,7 @@
                                                 BoxShadow="{DynamicResource Shadow}"
                                                 CornerRadius="{TemplateBinding CornerRadius}"
                                                 Margin="2,0,2,4"
-                                                MinWidth="{CompiledBinding #Border.Bounds.Width}">
+                                                MinWidth="{Binding #Border.Bounds.Width}">
                                                 <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
                                                     <ItemsPresenter
                                                         ItemsPanel="{TemplateBinding ItemsPanel}"

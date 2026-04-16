@@ -102,7 +102,7 @@
                                 VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
                                 <ContentPresenter.DataTemplates>
                                     <DataTemplate DataType="system:String">
-                                        <TextBlock Text="{CompiledBinding}" />
+                                        <TextBlock Text="{Binding}" />
                                     </DataTemplate>
                                 </ContentPresenter.DataTemplates>
                             </ContentPresenter>

@@ -75,7 +75,7 @@
                             Spacing="8">
                             <Button
                                 Content="{TemplateBinding CancelButtonText}"
-                                IsVisible="{CompiledBinding Content,
+                                IsVisible="{Binding Content,
                                                             ElementName=PART_CancelButton,
                                                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                 MinWidth="80"
@@ -84,7 +84,7 @@
                                                                                Converter={x:Static shadui:DialogButtonStyleConverters.ToClass}}" />
                             <Button
                                 Content="{TemplateBinding TertiaryButtonText}"
-                                IsVisible="{CompiledBinding Content,
+                                IsVisible="{Binding Content,
                                                             ElementName=PART_TertiaryButton,
                                                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                 MinWidth="80"
@@ -93,7 +93,7 @@
                                                                                Converter={x:Static shadui:DialogButtonStyleConverters.ToClass}}" />
                             <Button
                                 Content="{TemplateBinding SecondaryButtonText}"
-                                IsVisible="{CompiledBinding Content,
+                                IsVisible="{Binding Content,
                                                             ElementName=PART_SecondaryButton,
                                                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                 MinWidth="80"
@@ -102,7 +102,7 @@
                                                                                Converter={x:Static shadui:DialogButtonStyleConverters.ToClass}}" />
                             <Button
                                 Content="{TemplateBinding PrimaryButtonText}"
-                                IsVisible="{CompiledBinding Content,
+                                IsVisible="{Binding Content,
                                                             ElementName=PART_PrimaryButton,
                                                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                                 MinWidth="80"

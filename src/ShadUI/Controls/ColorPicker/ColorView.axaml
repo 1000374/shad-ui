@@ -201,8 +201,8 @@
                                             Width="112">
                                             <NumericUpDown.InnerLeftContent>
                                                 <Panel Margin="12,0,0,0">
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="R" />
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="H" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="R" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="H" />
                                                 </Panel>
                                             </NumericUpDown.InnerLeftContent>
                                         </NumericUpDown>
@@ -234,8 +234,8 @@
                                             Width="112">
                                             <NumericUpDown.InnerLeftContent>
                                                 <Panel Margin="12,0,0,0">
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="G" />
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="S" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="G" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="S" />
                                                 </Panel>
                                             </NumericUpDown.InnerLeftContent>
                                         </NumericUpDown>
@@ -267,8 +267,8 @@
                                             Width="112">
                                             <NumericUpDown.InnerLeftContent>
                                                 <Panel Margin="12,0,0,0">
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="B" />
-                                                    <TextBlock IsVisible="{CompiledBinding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="V" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Rgba}}" Text="B" />
+                                                    <TextBlock IsVisible="{Binding $parent[ColorView].ColorModel, Converter={x:Static shadui:BasicConverters.EnumToBoolConverter}, ConverterParameter={x:Static controls:ColorModel.Hsva}}" Text="V" />
                                                 </Panel>
                                             </NumericUpDown.InnerLeftContent>
                                         </NumericUpDown>

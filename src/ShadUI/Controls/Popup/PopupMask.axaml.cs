@@ -14,6 +14,7 @@ namespace ShadUI
     /// </summary>
     public class PopupMask : TemplatedControl
     {
+        /// <summary>
         ///     These controls are displayed above all others and fill the entire window.
         ///     Useful for things like popups.
         /// </summary>

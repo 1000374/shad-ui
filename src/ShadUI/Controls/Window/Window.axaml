@@ -1,14 +1,13 @@
 ﻿<ResourceDictionary
     xmlns="https://github.com/avaloniaui"
-    xmlns:shadui="clr-namespace:ShadUI"
-    xmlns:system="clr-namespace:System;assembly=netstandard"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:shadui="clr-namespace:ShadUI">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="avares://ShadUI/Controls/Constants.axaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <ControlTheme TargetType="Button" x:Key="WindowButtonStyle">
+    <ControlTheme x:Key="WindowButtonStyle" TargetType="Button">
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}" />
@@ -18,21 +17,21 @@
         <Setter Property="Padding" Value="0" />
         <Setter Property="Transitions">
             <Transitions>
-                <BrushTransition Duration="0.001" Property="Background" />
+                <BrushTransition Property="Background" Duration="0.001" />
             </Transitions>
         </Setter>
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Background="{TemplateBinding Background}">
                     <ContentPresenter
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                         Content="{TemplateBinding Content}"
                         Foreground="{TemplateBinding Foreground}"
-                        Height="{TemplateBinding Height}"
-                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        Padding="{TemplateBinding Padding}"
-                        RecognizesAccessKey="True"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                        Width="{TemplateBinding Width}" />
+                        RecognizesAccessKey="True" />
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -50,12 +49,14 @@
         </Style>
     </ControlTheme>
 
-    <ControlTheme TargetType="shadui:Window" x:Key="WindowTheme">
+    <ControlTheme x:Key="WindowTheme" TargetType="shadui:Window">
         <Setter Property="Margin" Value="0" />
         <Setter Property="Background" Value="{DynamicResource WindowBackgroundColor}" />
         <Setter Property="TransparencyLevelHint" Value="Transparent" />
-        <Setter Property="SystemDecorations" Value="{OnPlatform Full, Linux=None, x:TypeArguments=SystemDecorations}" />
-        <Setter Property="ExtendClientAreaChromeHints" Value="PreferSystemChrome" />
+        <Setter Property="WindowDecorations" Value="{OnPlatform None, Linux=None, x:TypeArguments=WindowDecorations}" />
+        <!--  ExtendClientAreaChromeHints removed in Avalonia 12; NoChrome is achieved via WindowDecorations=None  -->
+        <!--  use -1 to trigger top border cursor  -->
+        <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="-1" />
         <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
         <Setter Property="TextElement.Foreground" Value="{DynamicResource ForegroundColor}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -63,22 +64,16 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border
+                    Margin="{TemplateBinding Margin}"
                     Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}"
                     BorderThickness="{TemplateBinding BorderThickness}"
                     ClipToBounds="True"
-                    CornerRadius="{TemplateBinding RootCornerRadius}"
-                    Margin="{TemplateBinding Margin}">
-                    <VisualLayerManager IsHitTestVisible="True">
-                        <VisualLayerManager.ChromeOverlayLayer>
-                            <ItemsControl ItemsSource="{CompiledBinding Hosts, RelativeSource={RelativeSource AncestorType={x:Type shadui:Window}}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Panel />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>
-                        </VisualLayerManager.ChromeOverlayLayer>
+                    CornerRadius="{OnPlatform '0',
+                                              Linux='10',
+                                              x:TypeArguments=CornerRadius}">
+                    <!--  Avalonia 12: VisualLayerManager.ChromeOverlayLayer removed; overlay now lives in a sibling Panel inside a Grid  -->
+                    <Grid>
                         <Panel Name="PART_Root">
                             <DockPanel LastChildFill="True">
                                 <Panel DockPanel.Dock="Top">
@@ -90,117 +85,117 @@
                                             <Setter Property="BorderThickness" Value="0,0,0,0" />
                                         </Style>
                                     </Panel.Styles>
-                                    <StackPanel ClipToBounds="True">
+                                    <StackPanel>
                                         <LayoutTransformControl Name="LayoutTransform" RenderTransformOrigin="0%,0%">
-                                            <Border ClipToBounds="True" CornerRadius="{TemplateBinding RootCornerRadius, Converter={x:Static shadui:CornerRadiusConverters.TopOnly}}">
-                                                <Panel Margin="0,-1,0,0">
-                                                    <Border IsVisible="{TemplateBinding ShowTitlebarBackground}" Name="PART_TitleBarBackground" />
-                                                    <DockPanel LastChildFill="True">
-                                                        <StackPanel
-                                                            DockPanel.Dock="Right"
-                                                            Orientation="Horizontal"
-                                                            Spacing="6">
-                                                            <StackPanel.Styles>
-                                                                <Style Selector="PathIcon">
-                                                                    <Setter Property="Height" Value="10" />
-                                                                    <Setter Property="Width" Value="10" />
-                                                                </Style>
-                                                            </StackPanel.Styles>
-                                                            <ContentPresenter
-                                                                Content="{TemplateBinding RightWindowTitleBarContent}"
-                                                                IsVisible="{TemplateBinding RightWindowTitleBarContent,
-                                                                                            Converter={x:Static ObjectConverters.IsNotNull}}"
-                                                                Margin="0,3,2,2"
-                                                                Name="RightButtons" />
-                                                            <StackPanel Name="ButtonsPanel" Orientation="Horizontal">
-                                                                <StackPanel.IsVisible>
-                                                                    <OnPlatform
-                                                                        Linux="True"
-                                                                        Windows="True"
-                                                                        macOS="False"
-                                                                        x:TypeArguments="system:Boolean" />
-                                                                </StackPanel.IsVisible>
-                                                                <Button
-                                                                    IsEnabled="{TemplateBinding CanMinimize}"
-                                                                    IsVisible="{TemplateBinding CanMinimize}"
-                                                                    Margin="0,0,0,1"
-                                                                    Name="PART_MinimizeButton"
-                                                                    Theme="{StaticResource WindowButtonStyle}">
-                                                                    <PathIcon Data="{x:Static shadui:Icons.WindowMinimize}" Name="MinimizeIcon" />
-                                                                </Button>
-                                                                <Button
-                                                                    IsVisible="{TemplateBinding CanMaximize}"
-                                                                    Margin="0,0,0,1"
-                                                                    Name="PART_MaximizeButton"
-                                                                    Theme="{StaticResource WindowButtonStyle}">
-                                                                    <Button.IsEnabled>
-                                                                        <MultiBinding Converter="{x:Static BoolConverters.And}">
-                                                                            <Binding Path="$parent[shadui:Window].CanResize" />
-                                                                            <Binding Path="$parent[shadui:Window].CanMaximize" />
-                                                                        </MultiBinding>
-                                                                    </Button.IsEnabled>
-                                                                    <PathIcon
-                                                                        Data="{x:Static shadui:Icons.WindowMaximize}"
-                                                                        IsHitTestVisible="False"
-                                                                        Name="MaximizeIcon" />
-                                                                </Button>
-                                                                <Button
-                                                                    Classes="Close"
-                                                                    Margin="0,0,0,1"
-                                                                    Name="PART_CloseButton"
-                                                                    Theme="{StaticResource WindowButtonStyle}">
-                                                                    <PathIcon
-                                                                        Data="{x:Static shadui:Icons.WindowClose}"
-                                                                        Foreground="{CompiledBinding Foreground,
-                                                                                                     ElementName=PART_CloseButton}"
-                                                                        Name="CloseIcon" />
-                                                                </Button>
-                                                            </StackPanel>
+                                            <Panel Margin="0,-1,0,0">
+                                                <Border Name="PART_TitleBarBackground" IsVisible="{TemplateBinding ShowTitlebarBackground}" />
+                                                <DockPanel LastChildFill="True">
+                                                    <StackPanel
+                                                        DockPanel.Dock="Right"
+                                                        Orientation="Horizontal"
+                                                        Spacing="8">
+                                                        <StackPanel.Styles>
+                                                            <Style Selector="PathIcon">
+                                                                <Setter Property="Height" Value="10" />
+                                                                <Setter Property="Width" Value="10" />
+                                                            </Style>
+                                                        </StackPanel.Styles>
+                                                        <ContentPresenter
+                                                            Name="RightButtons"
+                                                            Margin="0,3,0,2"
+                                                            Content="{TemplateBinding RightWindowTitleBarContent}"
+                                                            IsVisible="{TemplateBinding RightWindowTitleBarContent,
+                                                                                        Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                                        <StackPanel Name="ButtonsPanel" Orientation="Horizontal">
+                                                            <Button
+                                                                Name="PART_MinimizeButton"
+                                                                Margin="0,0,0,1"
+                                                                IsEnabled="{TemplateBinding CanMinimize}"
+                                                                IsVisible="{TemplateBinding CanMinimize}"
+                                                                Theme="{StaticResource WindowButtonStyle}">
+                                                                <PathIcon Name="MinimizeIcon" Data="{x:Static shadui:Icons.WindowMinimize}" />
+                                                            </Button>
+                                                            <Button
+                                                                Name="PART_MaximizeButton"
+                                                                Margin="0,0,0,1"
+                                                                IsVisible="{TemplateBinding CanMaximize}"
+                                                                Theme="{StaticResource WindowButtonStyle}">
+                                                                <Button.IsEnabled>
+                                                                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                                        <Binding Path="$parent[shadui:Window].CanResize" />
+                                                                        <Binding Path="$parent[shadui:Window].CanMaximize" />
+                                                                    </MultiBinding>
+                                                                </Button.IsEnabled>
+                                                                <PathIcon
+                                                                    Name="MaximizeIcon"
+                                                                    Data="{x:Static shadui:Icons.WindowMaximize}"
+                                                                    IsHitTestVisible="False" />
+                                                            </Button>
+                                                            <Button
+                                                                Name="PART_CloseButton"
+                                                                Margin="0,0,0,1"
+                                                                Classes="Close"
+                                                                Theme="{StaticResource WindowButtonStyle}">
+                                                                <PathIcon
+                                                                    Name="CloseIcon"
+                                                                    Data="{x:Static shadui:Icons.WindowClose}"
+                                                                    Foreground="{CompiledBinding Foreground,
+                                                                                                 ElementName=PART_CloseButton}" />
+                                                            </Button>
                                                         </StackPanel>
-                                                        <StackPanel
-                                                            IsHitTestVisible="False"
-                                                            Name="AppTitlePanel"
-                                                            Orientation="Horizontal"
-                                                            Spacing="10"
+                                                    </StackPanel>
+                                                    <StackPanel
+                                                        Name="AppTitlePanel"
+                                                        VerticalAlignment="Center"
+                                                        IsHitTestVisible="False"
+                                                        Orientation="Horizontal"
+                                                        Spacing="10">
+                                                        <ContentPresenter
+                                                            HorizontalAlignment="Left"
+                                                            Content="{TemplateBinding LogoContent}"
+                                                            IsHitTestVisible="False" />
+                                                        <TextBlock
                                                             VerticalAlignment="Center"
-                                                            HorizontalAlignment="{OnPlatform Left, macOS=Center}">
-                                                            <ContentPresenter
-                                                                Content="{TemplateBinding LogoContent}"
-                                                                HorizontalAlignment="Left"
-                                                                IsHitTestVisible="False" />
-                                                            <TextBlock
-                                                                FontSize="{TemplateBinding TitleFontSize}"
-                                                                FontWeight="{TemplateBinding TitleFontWeight}"
-                                                                IsHitTestVisible="False"
-                                                                Text="{TemplateBinding Title}"
-                                                                VerticalAlignment="Center" />
-                                                        </StackPanel>
-                                                    </DockPanel>
-                                                </Panel>
-                                            </Border>
+                                                            FontSize="{TemplateBinding TitleFontSize}"
+                                                            FontWeight="{TemplateBinding TitleFontWeight}"
+                                                            IsHitTestVisible="False"
+                                                            Text="{TemplateBinding Title}" />
+                                                    </StackPanel>
+                                                </DockPanel>
+                                            </Panel>
                                         </LayoutTransformControl>
                                         <Panel
-                                            Background="{DynamicResource TitleBarBackgroundColor}"
                                             Height="32"
+                                            Background="{DynamicResource TitleBarBackgroundColor}"
                                             IsVisible="{TemplateBinding IsMenuVisible}">
                                             <ContentPresenter
-                                                Content="{TemplateBinding MenuBarContent}"
+                                                Name="MenuBar"
                                                 Margin="8,0,8,4"
-                                                Name="MenuBar" />
+                                                Content="{TemplateBinding MenuBarContent}" />
                                         </Panel>
-                                        <Border BorderBrush="{DynamicResource BorderColor30}" Name="BottomBorder" />
+                                        <Border Name="BottomBorder" BorderBrush="{DynamicResource BorderColor30}" />
                                     </StackPanel>
                                 </Panel>
                                 <ContentPresenter
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Content="{TemplateBinding Content}"
                                     ContentTemplate="{TemplateBinding ContentTemplate}"
                                     CornerRadius="10"
-                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    IsHitTestVisible="True"
-                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                                    IsHitTestVisible="True" />
                             </DockPanel>
                         </Panel>
-                    </VisualLayerManager>
+                        <!--  Overlay layer: dialog/toast hosts rendered on top of all window content  -->
+                        <ItemsControl
+                            IsHitTestVisible="True"
+                            ItemsSource="{CompiledBinding Hosts, RelativeSource={RelativeSource AncestorType={x:Type shadui:Window}}}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Panel />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Grid>
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -219,9 +214,9 @@
                 <Style Selector="^ /template/ LayoutTransformControl#LayoutTransform">
                     <Style.Animations>
                         <Animation
-                            Duration="0:0:0.35"
                             Easing="CircularEaseOut"
-                            FillMode="Forward">
+                            FillMode="Forward"
+                            Duration="0:0:0.35">
                             <KeyFrame Cue="0%">
                                 <Setter Property="ScaleTransform.ScaleY" Value="0" />
                                 <Setter Property="IsVisible" Value="True" />
@@ -284,9 +279,9 @@
                 <Style Selector="^ /template/ LayoutTransformControl#LayoutTransform">
                     <Style.Animations>
                         <Animation
-                            Duration="0:0:0.35"
                             Easing="CircularEaseOut"
-                            FillMode="Forward">
+                            FillMode="Forward"
+                            Duration="0:0:0.35">
                             <KeyFrame Cue="0%">
                                 <Setter Property="ScaleTransform.ScaleY" Value="1" />
                             </KeyFrame>
@@ -314,7 +309,7 @@
         </Style>
     </ControlTheme>
     <ControlTheme
+        x:Key="{x:Type shadui:Window}"
         BasedOn="{StaticResource WindowTheme}"
-        TargetType="shadui:Window"
-        x:Key="{x:Type shadui:Window}" />
+        TargetType="shadui:Window" />
 </ResourceDictionary>
